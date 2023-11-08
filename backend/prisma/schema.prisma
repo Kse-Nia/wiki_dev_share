@@ -6,3 +6,73 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id        String   @id @default(auto()) @map("_id")
+  createdAt DateTime @default(now())
+  email     String   @unique
+  name      String?
+  avatar    String?
+  role      Role     @default(USER)
+  posts     Post[]
+  badge     Badge[]
+}
+
+model Badge {
+  id          String @id @default(auto()) @map("_id")
+  name        String
+  description String
+  criteria    String
+}
+
+model Post {
+  id        String   @id @default(auto()) @map("_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean  @default(false)
+  title     String   @db.VarChar(255)
+  authorId  String   @db.ObjectId
+  author    User?    @relation(fields: [authorId], references: [id])
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  body      String   @db.VarChar(255)
+  postId    String   @db.ObjectId
+  post      Post     @relation(fields: [postId], references: [id])
+  authorId  String   @db.ObjectId
+  author    User     @relation(fields: [authorId], references: [id])
+}
+
+model WikiArticle {
+  id        String   @id @default(auto()) @map("_id")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String   @db.VarChar(255)
+  content   String   @db.Text
+  authorId  String   @db.ObjectId
+  author    User     @relation(fields: [authorId], references: [id])
+}
+
+model WikiComment {
+  id        String      @id @default(auto()) @map("_id")
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  body      String      @db.VarChar(255)
+  articleId String      @db.ObjectId
+  article   WikiArticle @relation(fields: [articleId], references: [id])
+  authorId  String      @db.ObjectId
+  author    User        @relation(fields: [authorId], references: [id])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Role {
+  USER
+  ADMIN
+}
