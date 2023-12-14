@@ -8,6 +8,7 @@ export default function Home() {
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
         <h1> Hello World ! </h1>
         <p> My name is WikiShare </p>
+        <p> I am a wiki website made for developpers :) </p>
       </main>
       <Footer />
     </>

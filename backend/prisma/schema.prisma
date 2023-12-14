@@ -8,38 +8,45 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id")
-  createdAt DateTime @default(now())
-  email     String   @unique
-  name      String?
-  avatar    String?
-  role      Role     @default(USER)
-  posts     Post[]
-  badge     Badge[]
+  id          String        @id @default(cuid()) @map("_id") @db.ObjectId
+  createdAt   DateTime      @default(now())
+  email       String        @unique
+  name        String?
+  avatar      String?
+  role        Role          @default(USER)
+  posts       Post[]
+  badge       Badge[]
+  Comment     Comment[]
+  WikiArticle WikiArticle[]
+  WikiComment WikiComment[]
 }
 
 model Badge {
-  id          String @id @default(auto()) @map("_id")
-  name        String
-  description String
-  criteria    String
+  id           String @id @default(cuid()) @map("_id") @db.ObjectId
+  name         String
+  description  String
+  criteria     String
+  badgePicture String
+  userId       String @db.ObjectId
+  User         User?  @relation(fields: [userId], references: [id])
 }
 
 model Post {
-  id        String   @id @default(auto()) @map("_id")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  published Boolean  @default(false)
-  title     String   @db.VarChar(255)
-  authorId  String   @db.ObjectId
-  author    User?    @relation(fields: [authorId], references: [id])
+  id        String    @id @default(cuid()) @map("_id") @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  title     String
+  published Boolean   @default(false)
+  authorId  String    @db.ObjectId
+  author    User      @relation(fields: [authorId], references: [id])
+  Comment   Comment[]
 }
 
 model Comment {
-  id        String   @id @default(auto()) @map("_id")
+  id        String   @id @default(cuid()) @map("_id") @db.ObjectId
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  body      String   @db.VarChar(255)
+  body      String
   postId    String   @db.ObjectId
   post      Post     @relation(fields: [postId], references: [id])
   authorId  String   @db.ObjectId
@@ -47,20 +54,21 @@ model Comment {
 }
 
 model WikiArticle {
-  id        String   @id @default(auto()) @map("_id")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  title     String   @db.VarChar(255)
-  content   String   @db.Text
-  authorId  String   @db.ObjectId
-  author    User     @relation(fields: [authorId], references: [id])
+  id          String        @id @default(cuid()) @map("_id") @db.ObjectId
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  title       String
+  content     String
+  authorId    String        @db.ObjectId
+  author      User          @relation(fields: [authorId], references: [id])
+  WikiComment WikiComment[]
 }
 
 model WikiComment {
-  id        String      @id @default(auto()) @map("_id")
+  id        String      @id @default(cuid()) @map("_id") @db.ObjectId
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
-  body      String      @db.VarChar(255)
+  body      String
   articleId String      @db.ObjectId
   article   WikiArticle @relation(fields: [articleId], references: [id])
   authorId  String      @db.ObjectId
@@ -70,9 +78,5 @@ model WikiComment {
 enum Role {
   USER
   ADMIN
-}
-
-enum Role {
-  USER
-  ADMIN
+  Moderator
 }
